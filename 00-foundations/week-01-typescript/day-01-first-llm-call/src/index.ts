@@ -1,3 +1,5 @@
+import readline from "node:readline/promises";
+import { stdin, stdout } from "node:process";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 
@@ -10,27 +12,33 @@ if (!apiKey) {
 
 const ai = new GoogleGenAI({ apiKey });
 
-// Swapped to an alternative active flash model
 const MODEL = "gemini-3.5-flash-lite";
 
 async function main() {
-  const idea = "I learned TypeScript today";
-  console.log(`Sending request to Gemini using model: ${MODEL}...`);
-
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: `Write a LinkedIn post about: ${idea}`,
-    config: {
-      systemInstruction:
-        "You write short, clear LinkedIn posts for a MERN developer.",
-    },
+  const rl = readline.createInterface({
+    input: stdin,
+    output: stdout,
   });
 
-  console.log("\n--- Response ---");
-  console.log(response.text);
-  console.log("\nToken usage:", response.usageMetadata);
+  try {
+    const prompt = await rl.question("Enter your prompt: ");
+
+    if (!prompt.trim()) {
+      console.log("Please enter a valid prompt.");
+      return;
+    }
+
+    const response = await ai.models.generateContent({
+      model: MODEL,
+      contents: prompt,
+    });
+
+    console.log("\nAI Response:\n" + (response.text ?? "No response returned."));
+  } catch (error) {
+    console.error("LLM request failed:", error);
+  } finally {
+    rl.close();
+  }
 }
 
-main().catch((error) => {
-  console.error("LLM request failed:", error);
-});
+main();
