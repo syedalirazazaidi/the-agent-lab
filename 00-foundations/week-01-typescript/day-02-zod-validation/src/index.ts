@@ -23,7 +23,11 @@ async function main() {
 
   try {
     const rawPrompt = await rl.question("Enter your prompt: ");
-    const result = validatePrompt(rawPrompt);
+    const rawRole = await rl.question(
+      "Choose role (teacher / developer / interviewer): "
+    );
+
+    const result = validatePrompt(rawPrompt, rawRole);
 
     if (!result.success) {
       console.log("Validation failed:");
@@ -33,11 +37,22 @@ async function main() {
       return;
     }
 
-    const prompt = result.data.prompt;
+    const { prompt, role } = result.data;
+
+    const systemInstruction = {
+      teacher: "You are a helpful teacher. Explain concepts clearly and step by step.",
+      developer:
+        "You are a senior developer. Give practical, technical, and concise advice.",
+      interviewer:
+        "You are an interview coach. Ask smart follow-up questions and guide the user clearly.",
+    }[role];
 
     const response = await ai.models.generateContent({
       model: MODEL,
       contents: prompt,
+      config: {
+        systemInstruction,
+      },
     });
 
     console.log("\nAI Response:\n" + (response.text ?? "No response returned."));
