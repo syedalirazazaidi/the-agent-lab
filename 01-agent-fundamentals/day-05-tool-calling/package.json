@@ -1,17 +1,25 @@
 {
-  "name": "day-05-tool-calling",
+  "name": "day-01-first-llm-call",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Day 1: first LLM call with Gemini",
+  "main": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/genai": "^3.0.0",
     "dotenv": "^18.0.10",
-    "groq-sdk": "^1.6.0"
+    "openai": "^7.55.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }
