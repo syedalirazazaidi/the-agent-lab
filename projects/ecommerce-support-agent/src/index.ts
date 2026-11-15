@@ -2,6 +2,7 @@ import express from "express";
 import { config } from "./config/env";
 import { connectMongo } from "./db/connect";
 import { createUser, getUsersByRole } from "./services/userService";
+import { createProduct, getProductsBySeller } from "./services/productService";
 
 const app = express();
 app.use(express.json());
@@ -42,6 +43,44 @@ app.get("/users/:role", async (req, res) => {
     res.json({ role, users });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch users", error });
+  }
+});
+
+app.post("/products", async (req, res) => {
+  try {
+    const db = await connectMongo();
+    const { name, description, price, stock, sellerId } = req.body;
+
+    if (!name || !description || !price || !stock || !sellerId) {
+      return res.status(400).json({
+        message: "Please send name, description, price, stock, and sellerId",
+      });
+    }
+
+    const newProduct = await createProduct(db, {
+      name,
+      description,
+      price: Number(price),
+      stock: Number(stock),
+      sellerId,
+      createdAt: new Date(),
+    });
+
+    res.status(201).json({ message: "Product created", product: newProduct });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create product", error });
+  }
+});
+
+app.get("/products/:sellerId", async (req, res) => {
+  try {
+    const db = await connectMongo();
+    const { sellerId } = req.params;
+
+    const products = await getProductsBySeller(db, sellerId);
+    res.json({ sellerId, products });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch products", error });
   }
 });
 
