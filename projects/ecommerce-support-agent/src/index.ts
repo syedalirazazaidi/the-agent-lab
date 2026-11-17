@@ -2,7 +2,7 @@ import express from "express";
 import { config } from "./config/env";
 import { connectMongo } from "./db/connect";
 import { createUser, getUsersByRole } from "./services/userService";
-import { createProduct, getProductsBySeller } from "./services/productService";
+import { createProduct, getProducts, getProductsBySeller } from "./services/productService";
 
 const app = express();
 app.use(express.json());
@@ -69,6 +69,20 @@ app.post("/products", async (req, res) => {
     res.status(201).json({ message: "Product created", product: newProduct });
   } catch (error) {
     res.status(500).json({ message: "Failed to create product", error });
+  }
+});
+
+app.get("/products", async (req, res) => {
+  try {
+    const db = await connectMongo();
+    const products = await getProducts(db);
+
+    res.json({
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch products", error });
   }
 });
 
