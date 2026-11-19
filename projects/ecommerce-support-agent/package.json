@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "tsx src/index.ts",
+    "seed": "tsx src/seed.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
